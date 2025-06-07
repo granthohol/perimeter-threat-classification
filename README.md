@@ -17,7 +17,7 @@ Implements:
 ---
 
 ## 📂 Project Structure
-
+```txt
 sensor_fusion_project/
 ├── data/ # Raw and output data (ignored by Git)
 ├── fusion/ # C++ fusion node
@@ -26,7 +26,7 @@ sensor_fusion_project/
 ├── palantir_integration/ # Ontology + ingestion simulation
 ├── README.md
 └── .gitignore
-
+```
 
 ---
 
@@ -80,3 +80,23 @@ uv pip install torch torchvision opencv-python flask
     ```bash
     python3 ml/train_model.py
     ```
+
+4. Run inference
+```bash
+python3 ml/inference.py
+```
+
+5. Launch dashboard
+```bash
+python3 visualization/app.py
+```
+
+6. Simulate AIP ingestion
+```bash
+python3 palantir_integration/ingest_to_mock_aip.py
+```
+
+## 📈 Future Work
+
+- Kalman filters for multi-target tracking
+- Add radar modality
