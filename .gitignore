@@ -1,3 +1,19 @@
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+sensor_fusion
+
+# PyTorch
+ml/model.python
+
+# temp files
+*.swp
+*.swo
+*.DS_Store
+
 # Ignore local data
 data/
 
