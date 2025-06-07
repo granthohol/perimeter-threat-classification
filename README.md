@@ -1,6 +1,6 @@
 # AI-Driven Sensor Fusion for Autonomous Perimeter Defense
 
-**A portfolio project by [Your Name]**
+**A portfolio project by Grant Hohol**
 
 ---
 
