@@ -18,7 +18,7 @@ Implements:
 
 ## 📂 Project Structure
 ```txt
-sensor_fusion_project/
+perimeter-threat-classification/
 ├── data/ # Raw and output data (ignored by Git)
 ├── fusion/ # C++ fusion node
 ├── ml/ # Training and inference scripts
