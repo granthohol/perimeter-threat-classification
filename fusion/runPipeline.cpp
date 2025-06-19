@@ -36,14 +36,58 @@ static double parseTimestamp(const std::string &s) {
     return static_cast<double>(t) + frac;
   }
   // Otherwise assume a plain floating-point string
-  return std::stod(s);
+  return std::stod(s); // stod = string to double
 }
 
 
 
 namespace fusion {
 
+
+    ThreatObject createThreatObject(
+        int id,
+        const cv::Mat &frame,
+        pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
+        double timestamp
+    ){
+        // implementation
+        ThreatObject obj;
+        obj.id = id;
+
+        // 1. Compute 3D centroid of the cloud for the objects location
+        //    aka condense a variable sized point cloud into a single x,y,z average location
+        float sum_x = 0, sum_y = 0, sum_z = 0;
+
+        for (const auto &pt : cloud->points){ // iterate over each point in the cloud
+            sum_x += pt.x;
+            sum_y += pt.y;
+            sum_z += pt.z;
+        }
+
+        const float n = static_cast<float>(cloud->points.size()); // converts int (the cloud length) to float for float division later
+
+        if (n > 0){ // calculate averages
+            obj.x = sum_x / n;
+            obj.y = sum_y / n;
+            obj.z = sum_z / n;
+        } else {
+            obj.x = obj.y = obj.z = 0.0f;
+        }
+
+        // 2. Placeholder classification -- we will swap in the real model later
+        obj.type = "unknown";
+        obj.confidence = 0.0f;
+
+        // 3. Placeholder velocity -- to be computed from timestamps and centroids later
+        obj.velocity = 0.0f;
+
+        return obj;
+
+    }
+
     void runPipeline(){
+
+        // ------ Stage 1: Camera Ingestion ----- 
         std::cout << "[fusion] Stage 1: Camera Ingestion\n";
 
         // 1. Define the path to a test image
@@ -64,7 +108,7 @@ namespace fusion {
                   << image.cols << "x" << image.rows << " pixels\n"; 
 
         
-        // Stage 2: LIDAR
+        // ----- Stage 2: LIDAR ----- 
         std::cout << "[fusion] Stage 2: LiDAR Ingestion\n";
 
         // a. Path to the first LiDAR scan (.bin)
@@ -111,7 +155,7 @@ namespace fusion {
         std::cout << "[fusion] Loaded LiDAR scan: " << cloud->points.size() << " points\n"; 
 
 
-        // Stage 3: Timestamp Synchronization
+        // ----- Stage 3: Timestamp Synchronization ------
         std::cout << "[fusion] Stage 3: Timestamp Synchronization\n";
 
         // a. Load camera timestamps
@@ -170,6 +214,29 @@ namespace fusion {
                       << "), Δ=" << bestDiff << "s\n";
 
         }
+
+
+        // ----- Stage 4: Build ThreatObject for the first synced pair -----
+        std::cout << "[fusion] Stage 4: Creating ThreatObject\n";
+
+        // Used index 0 and the synced data from Stage 1 and 2 to create a ThreatObject
+        auto threat = createThreatObject(
+            0,          // unique ID
+            image,      // the cv::Mat from camera ingestion
+            cloud,      // the pcl::PointCloud from LiDAR ingestion
+            camTs[0]    // timestamp for this frame
+        );
+
+        // Print out its fields
+        std::cout << "[fusion] ThreatObject {\n"
+              << "  id: "         << threat.id         << "\n"
+              << "  location: ("  << threat.x << ", "
+                                    << threat.y << ", "
+                                    << threat.z << ")\n"
+              << "  type: "       << threat.type       << "\n"
+              << "  confidence: " << threat.confidence << "\n"
+              << "  velocity: "   << threat.velocity   << "\n"
+              << "}\n";    
 
 
 
